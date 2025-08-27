@@ -46,28 +46,84 @@ Para ejecutar este proyecto, necesitas configurarlo con tu propia instancia de S
 
 Clona el repositorio:
 
-git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+1. git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+2. Crea tu proyecto en Supabase:
 
-Crea tu proyecto en Supabase:
+  2.1 Ve a Supabase.io y crea un nuevo proyecto.
 
-Ve a Supabase.io y crea un nuevo proyecto.
+  2.2 En el dashboard de tu proyecto, ve a la sección SQL Editor.
 
-Ve a la sección SQL Editor en el dashboard de tu proyecto.
+  2.3 Abre el archivo schema.sql de este repositorio, copia todo su contenido, pégalo en el editor de Supabase y haz clic en "RUN". Esto creará todas las tablas, funciones y políticas de seguridad necesarias.
 
-Abre el archivo schema.sql de este repositorio, copia todo su contenido, pégalo en el editor de Supabase y haz clic en "RUN". Esto creará todas las tablas, funciones y políticas de seguridad necesarias.
+3. Ve a la sección Storage y crea los buckets necesarios con acceso público: activos, facturas, evidencias.
 
-Ve a la sección Storage y crea los buckets necesarios con acceso público: activos, facturas, evidencias.
+  3.1 Abre el archivo storage_schema.sql de este repositorio, copia todo su contenido, pégalo en el editor de Supabase y haz clic en "RUN". Esto creará todas las políticas de los buckets necesarias.
 
-Configura las claves de Supabase en el código:
+4. Instalar la CLI de Supabase
+Si aún no la tienes, primero debes instalar la Command Line Interface (CLI) de Supabase. Puedes encontrar las instrucciones detalladas y actualizadas para tu sistema operativo directamente en la documentación oficial de Supabase.
 
-Abre el archivo index.html.
+5. Desplegar las Edge Functions
+Ahora que tienes la CLI y estás dentro de la carpeta supabase, sigue estos pasos para desplegar las funciones.
 
-Busca la sección // --- CONFIGURACIÓN DE SUPABASE --- en el script.
+  5.1. Inicia sesión en la CLI de Supabase
+  Este comando te conectará con tu cuenta de Supabase.
+  
+  supabase login
+  Esto abrirá tu navegador para que autorices el acceso.
 
-Reemplaza los valores de SUPABASE_URL y SUPABASE_KEY con las claves de tu proyecto. Las encontrarás en Project Settings > API.
+  5.2 Vincula tu carpeta local con tu proyecto remoto
+  Necesitas el Project Ref (la ID de tu proyecto), que puedes encontrar en el panel de control de Supabase, en Project Settings > General.
 
-const SUPABASE_URL = 'URL_DE_TU_PROYECTO_SUPABASE';
-const SUPABASE_KEY = 'TU_CLAVE_PUBLICA_ANON';
+  Reemplaza 'TU_PROJECT_REF' con la ID de tu proyecto
+  
+  supabase link --project-ref TU_PROJECT_REF
+  La CLI te pedirá la contraseña de tu base de datos para verificar la conexión.
+
+  5.3 Verifica la conexión (Opcional pero recomendado)
+  Asegúrate de que estás conectado al proyecto correcto.
+
+  supabase status
+  Este comando te mostrará la información del proyecto remoto al que estás vinculado actualmente. 
+
+  5.4 Ahora sí, despliega tus funciones
+  Con tu proyecto ya vinculado, despliega todas tus funciones con este comando.
+
+  supabase functions deploy
+
+6. Configura las claves de Supabase en el código:
+
+  6.1 Abre el archivo index.html.
+  Busca la sección // --- CONFIGURACIÓN DE SUPABASE --- en el script.
+  Deberás reemplazar SUPABASE_URL y SUPABASE_KEY con las credenciales de tu proyecto.
+ 
+ ¿Cómo buscar la API Key y la URL en Supabase?
+ 
+ Dentro de tu proyecto en Supabase, ve a Project Settings (el ícono de engranaje en el menú lateral izquierdo).
+
+  Selecciona la pestaña API.
+
+  En la sección Project URL, encontrarás la URL que necesitas. Cópiala.
+
+  En la sección Project API Keys, copia la clave que dice anon y public. Importante: No uses la clave service_role en el frontend por seguridad.
+
+  Pega las credenciales en tu código JavaScript
+
+const SUPABASE_URL = 'URL_DE_TU_PROYECTO_SUPABASE'; // Pega aquí la URL
+const SUPABASE_KEY = 'TU_CLAVE_PUBLICA_ANON';      // Pega aquí la clave anon public
+
+(Opcional) Habilitar autenticación con Google:
+
+Si deseas permitir que los usuarios se registren o inicien sesión con su cuenta de Google, ve a la sección Authentication > Providers en tu dashboard de Supabase.
+
+Busca Google en la lista y habilítalo.
+
+Deberás seguir las instrucciones para configurar tus credenciales de cliente OAuth desde la Google Cloud Console. Puedes encontrar una guía detallada en la documentación de Supabase.
+
+(Opcional) Redireccionar la URL a tu servidor:
+
+Por defecto, después de acciones como la confirmación de correo o el inicio de sesión, Supabase redirige a su propia URL. Para que los usuarios regresen a tu sitio web, ve a Authentication > URL Configuration.
+
+En el campo Site URL, introduce la URL donde tendrás alojada la aplicación (por ejemplo, http://localhost:3000 para desarrollo local o https://tu-dominio.com para producción).
 
 ¡Listo! Abre el archivo index.html en tu navegador para empezar a usar la aplicación.
 
@@ -80,8 +136,9 @@ Haz un Fork del Repositorio: Crea una copia del proyecto en tu propia cuenta de 
 
 Crea una Nueva Rama:
 
-git checkout -b feature/nombre-de-tu-mejora
+Bash
 
+git checkout -b feature/nombre-de-tu-mejora
 Realiza tus Cambios: Escribe tu código y asegúrate de que todo funcione correctamente.
 
 Envía un Pull Request: Una vez que termines, envía un "Pull Request" desde tu rama a la rama main de este repositorio. Por favor, incluye una descripción clara de los cambios que realizaste.
@@ -95,8 +152,3 @@ Si esta aplicación te ha sido de utilidad, te ha ahorrado tiempo o te ha ayudad
 
 ✨ Una Nota Especial
 Este proyecto fue desarrollado en colaboración con Gemini, una IA de Google. Sirve como un ejemplo de cómo la inteligencia artificial puede actuar como un compañero de programación, ayudando a resolver problemas, generar código y acelerar el proceso de creación.
-
-El objetivo es inspirar a otros a aprender y a construir cosas increíbles. ¡La tecnología es una herramienta poderosa para convertir ideas en realidad!
-
-📜 Licencia
-Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
