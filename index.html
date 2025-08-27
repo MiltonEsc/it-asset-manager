@@ -436,38 +436,6 @@
             charts: {}
         };
         
-        // --- FUNCIONES DE UTILIDAD Y VERIFICACIÓN ---
-
-        /**
-         * Muestra una notificación temporal (toast) en la pantalla.
-         * @param {string} message - El mensaje a mostrar.
-         * @param {string} [type='info'] - El tipo de notificación ('info', 'success', 'error').
-         */
-        const showToast = (message, type = 'info') => {
-            const toast = document.createElement('div');
-            const bgColor = type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-blue-600' : 'bg-green-600');
-            toast.className = `fixed top-5 right-5 ${bgColor} text-white py-2 px-4 rounded-lg shadow-lg z-[10000] animate-fade-in-out`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.remove();
-            }, 4000);
-        }
-
-        /**
-         * Verifica si el usuario tiene una empresa activa. Si no, muestra un toast y redirige.
-         * @returns {boolean} - true si hay una empresa activa, false en caso contrario.
-         */
-        const verificarEmpresaActiva = () => {
-            const acceptedCompanies = state.companies.filter(c => c.status === 'accepted');
-            if (acceptedCompanies.length === 0 || !state.activeCompanyId) {
-                showToast('Primero debes crear o unirte a una empresa.', 'error');
-                showPage('empresas'); // Redirige al usuario a la página de gestión de empresas
-                return false;
-            }
-            return true;
-        };
-
         // --- FUNCIONES DE PERSISTENCIA (SUPABASE) ---
 
         // Carga todas las relaciones (pendientes, aceptadas) y actualiza el estado global.
@@ -558,21 +526,26 @@
 
                 if (data.id) {
                     // --- LÓGICA DE ACTUALIZACIÓN ---
+                    // Si el objeto 'data' tiene un ID, significa que estamos editando.
                     const itemId = data.id;
-                    delete data.id; 
+                    delete data.id; // No se debe incluir el ID en los datos a actualizar.
+                    
                     response = await supabaseClient
                         .from(tableName)
                         .update(data)
-                        .eq('id', itemId);
+                        .eq('id', itemId); // Usamos el ID para encontrar la fila correcta.
 
                 } else {
                     // --- LÓGICA DE INSERCIÓN ---
-                    delete data.id;
+                    // Si no hay ID, es un nuevo registro.
+                    delete data.id; // Nos aseguramos de que el ID no se envíe.
+                    
                     response = await supabaseClient
                         .from(tableName)
                         .insert(data);
                 }
 
+                // Verificamos si hubo un error en cualquiera de las dos operaciones.
                 const { error } = response;
                 if (error) throw error;
 
@@ -788,9 +761,12 @@
                 const equipo = log.equipo;
                 let evidenceHtml = 'N/A';
                 if (log.imagen) {
+                    // Revisa si la URL del archivo termina en .pdf (ignorando mayúsculas/minúsculas)
                     if (log.imagen.toLowerCase().endsWith('.pdf')) {
+                        // Si es un PDF, crea un enlace de texto
                         evidenceHtml = `<a href="${log.imagen}" target="_blank" class="text-blue-600 hover:underline">Ver PDF</a>`;
                     } else {
+                        // Si no, asume que es una imagen y crea la etiqueta <img>
                         evidenceHtml = `<img src="${log.imagen}" alt="Evidencia" class="h-10 w-10 object-cover rounded-md cursor-pointer" onclick="window.open('${log.imagen}')">`;
                     }
                 }
@@ -1081,17 +1057,7 @@
             const link = e.target.closest('a[data-page]');
             if (link) {
                 e.preventDefault();
-                const page = link.dataset.page;
-                
-                // Lista de páginas que requieren una empresa activa
-                const protectedPages = ['hojas-de-vida', 'inventario', 'mantenimiento', 'proveedores', 'registro', 'reportes'];
-                
-                if (protectedPages.includes(page)) {
-                    if (!verificarEmpresaActiva()) {
-                        return; // Detiene la navegación si no hay empresa
-                    }
-                }
-                showPage(page);
+                showPage(link.dataset.page);
             }
         });
 
@@ -1102,19 +1068,6 @@
         document.body.addEventListener('click', async e => {
             const target = e.target.closest('button');
             if (!target) return;
-
-            // --- Verificación centralizada para acciones que requieren una empresa ---
-            const requiresCompany = target.matches('.add-inventory-btn') ||
-                                  target.matches('#add-maintenance-btn') ||
-                                  target.matches('#add-provider-btn') ||
-                                  target.matches('.import-csv-btn') ||
-                                  target.matches('#import-users-btn');
-
-            if (requiresCompany && !verificarEmpresaActiva()) {
-                return; // Detiene la ejecución si no hay una empresa activa
-            }
-            // --- Fin de la verificación ---
-
             if (target.matches('.add-inventory-btn')) openInventoryModal(target.dataset.type);
             if (target.matches('.edit-inventory-btn')) openInventoryModal(target.dataset.type, target.dataset.id);
             if (target.matches('.delete-inventory-btn')) handleDeleteInventory(parseInt(target.dataset.id), target.dataset.type);
@@ -1215,6 +1168,7 @@
             const imageFile = formData.get('imagen');
             const facturaFile = formData.get('factura_pdf');
 
+            // Manejar la subida de la imagen
             if (imageFile && imageFile.size > 0) {
                 data.imagen = await uploadFile(imageFile, 'activos');
             } else if (state.editingInventoryId) {
@@ -1224,6 +1178,7 @@
                 data.imagen = null;
             }
 
+            // Manejar la subida del PDF
             if (type === 'equipo') {
                 if (facturaFile && facturaFile.size > 0) {
                     data.factura_pdf_url = await uploadFile(facturaFile, 'facturas');
@@ -1235,6 +1190,7 @@
             
             delete data.factura_pdf;
             
+            // FIX: Convertir campos de fecha vacíos a null para evitar errores en la base de datos
             if (data.fecha_compra === '') data.fecha_compra = null;
             if (data.fecha_vencimiento_garantia === '') data.fecha_vencimiento_garantia = null;
             if (data.fecha_vencimiento === '') data.fecha_vencimiento = null;
@@ -1323,8 +1279,6 @@
         
         userForm.addEventListener('submit', async e => {
             e.preventDefault();
-            if (!verificarEmpresaActiva()) return; // Salvaguarda extra
-            
             const formData = new FormData(userForm);
             const data = {
                 id: state.editingUserId,
@@ -1579,12 +1533,12 @@
 
             if (user.cuentas_creadas) {
                  doc.autoTable({
-                     startY: finalY,
-                     head: [['Cuentas de Usuario Creadas']],
-                     body: [[user.cuentas_creadas]],
-                     theme: 'grid'
-                 });
-                 finalY = doc.lastAutoTable.finalY + 10;
+                    startY: finalY,
+                    head: [['Cuentas de Usuario Creadas']],
+                    body: [[user.cuentas_creadas]],
+                    theme: 'grid'
+                });
+                finalY = doc.lastAutoTable.finalY + 10;
             }
 
             const equipo = state.inventario.equipos.find(e => e.id == user.equipo_id);
@@ -1625,11 +1579,11 @@
             
             if (user.trazabilidad && user.trazabilidad.length > 0) {
                  doc.autoTable({
-                     startY: finalY,
-                     head: [['Fecha', 'Acción', 'Detalle']],
-                     body: [...user.trazabilidad].reverse().map(log => [new Date(log.fecha).toLocaleString('es-CO'), log.accion, log.detalle]),
-                     theme: 'grid'
-                 });
+                    startY: finalY,
+                    head: [['Fecha', 'Acción', 'Detalle']],
+                    body: [...user.trazabilidad].reverse().map(log => [new Date(log.fecha).toLocaleString('es-CO'), log.accion, log.detalle]),
+                    theme: 'grid'
+                });
             }
 
             doc.save(`Hoja_de_Vida_${user.nombre.replace(/ /g, '_')}.pdf`);
@@ -1905,6 +1859,7 @@
             const name = companyForm.name.value;
             if (!name) return;
 
+            // Verificar si ya existe una empresa con ese nombre para el usuario actual
             const { data: existingCompany, error: checkError } = await supabaseClient
                 .from('companies')
                 .select('id')
@@ -2050,6 +2005,17 @@
             });
         };
 
+        const showToast = (message, type = 'info') => {
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-blue-600' : 'bg-green-600');
+            toast.className = `fixed top-5 right-5 ${bgColor} text-white py-2 px-4 rounded-lg shadow-lg z-[10000] animate-fade-in-out`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
         notificationsBtn.addEventListener('click', () => {
             notificationsPanel.classList.toggle('hidden');
         });
@@ -2141,8 +2107,8 @@
             const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                  options: {
-                     redirectTo: window.location.href
-                 }
+                    redirectTo: window.location.href
+                }
             });
             if (error) {
                 console.error('Error con el inicio de sesión de Google:', error.message);
@@ -2240,17 +2206,7 @@
             const companyId = deleteCompanyForm.company_id.value;
             const companyName = deleteCompanyForm.company_name.value;
 
-            // FIX: Explicitly set Authorization header to ensure authentication
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                showToast('Error de autenticación. Por favor, inicia sesión de nuevo.', 'error');
-                return;
-            }
-
             const { data, error } = await supabaseClient.functions.invoke('delete-company', {
-                headers: {
-                    'Authorization': `Bearer ${session.access_token}`,
-                },
                 body: { company_id: companyId },
             });
 
