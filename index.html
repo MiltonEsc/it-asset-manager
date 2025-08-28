@@ -55,6 +55,10 @@
                         <label for="login-password" class="text-sm font-medium text-gray-700">Contraseña</label>
                         <input id="login-password" name="password" type="password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
+                    <!-- Link de Olvidé Contraseña -->
+                    <div class="text-right text-sm">
+                        <a href="#" id="show-forgot-password-link" class="font-medium text-indigo-600 hover:text-indigo-500">¿Olvidaste tu contraseña?</a>
+                    </div>
                     <p id="login-error" class="text-sm text-red-600 text-center hidden">Email o contraseña incorrectos.</p>
                     <button type="submit" class="w-full py-2 px-4 font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Ingresar</button>
                 </form>
@@ -92,6 +96,22 @@
                     <button type="submit" class="w-full py-2 px-4 font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Registrarse</button>
                 </form>
                 <p class="text-center text-sm text-gray-600">¿Ya tienes cuenta? <a href="#" id="show-login-link" class="font-medium text-indigo-600 hover:text-indigo-500">Inicia sesión</a></p>
+            </div>
+        </div>
+        <!-- Formulario de Olvidé Contraseña -->
+        <div id="forgot-password-wrapper" class="w-full max-w-md hidden">
+            <div class="p-8 space-y-6 bg-white rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-center text-gray-900">Restablecer Contraseña</h1>
+                <p class="text-center text-gray-600">Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+                <p id="forgot-message" class="text-sm text-center"></p>
+                <form id="forgot-password-form" class="space-y-4">
+                    <div>
+                        <label for="forgot-email" class="text-sm font-medium text-gray-700">Email</label>
+                        <input id="forgot-email" name="email" type="email" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" class="w-full py-2 px-4 font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Enviar Enlace</button>
+                </form>
+                <p class="text-center text-sm text-gray-600"><a href="#" id="back-to-login-link" class="font-medium text-indigo-600 hover:text-indigo-500">&larr; Volver a Iniciar Sesión</a></p>
             </div>
         </div>
     </div>
@@ -343,6 +363,29 @@
             </div>
         </form>
     </dialog>
+
+    <!-- ===== NUEVO: Modal para Restablecer Contraseña ===== -->
+    <dialog id="reset-password-modal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
+        <div class="sticky top-0 bg-white p-4 flex justify-between items-center border-b">
+            <h3 class="text-xl font-semibold">Establecer Nueva Contraseña</h3>
+            <!-- No hay botón de cierre para forzar la acción del usuario -->
+        </div>
+        <form id="reset-password-form" class="p-6 space-y-4">
+            <p class="text-sm text-gray-600">Has seguido un enlace para restablecer tu contraseña. Por favor, introduce tu nueva contraseña a continuación.</p>
+            <div>
+                <label for="new-password" class="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
+                <input type="password" id="new-password" name="new_password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm">
+            </div>
+            <div>
+                <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirmar Nueva Contraseña</label>
+                <input type="password" id="confirm-password" name="confirm_password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm">
+            </div>
+            <p id="reset-password-error" class="text-sm text-red-600 text-center hidden"></p>
+            <div class="text-right">
+                <button type="submit" class="py-2 px-6 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Actualizar Contraseña</button>
+            </div>
+        </form>
+    </dialog>
     
     <!-- Plantillas -->
     <template id="user-card-template"><div class="bg-white rounded-xl shadow-lg p-6 flex flex-col"><div class="flex-grow"><h3 class="font-bold text-lg text-gray-900"></h3><p class="text-sm text-gray-600 mb-4"></p><div class="pt-4 border-t border-gray-200 text-sm space-y-2"><p><strong>Departamento:</strong> <span class="departamento"></span></p><p><strong>Cédula:</strong> <span class="cedula"></span></p><p><strong>Equipo:</strong> <span class="equipo"></span></p></div></div><div class="mt-4 pt-4 border-t border-gray-100 text-right space-x-2"><button class="edit-user-btn text-sm font-medium text-blue-600 hover:text-blue-800">Editar</button><button class="delete-user-btn text-sm font-medium text-red-600 hover:text-red-800">Eliminar</button><button class="view-user-btn text-sm font-medium text-indigo-600 hover:text-indigo-800">Ver Hoja de Vida &rarr;</button></div></div></template>
@@ -364,12 +407,16 @@
         const authContainer = document.getElementById('auth-container');
         const loginWrapper = document.getElementById('login-wrapper');
         const registerWrapper = document.getElementById('register-wrapper');
+        const forgotPasswordWrapper = document.getElementById('forgot-password-wrapper');
         const appContainer = document.getElementById('app-container');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
         const googleLoginBtn = document.getElementById('google-login-btn');
         const showRegisterLink = document.getElementById('show-register-link');
         const showLoginLink = document.getElementById('show-login-link');
+        const showForgotPasswordLink = document.getElementById('show-forgot-password-link');
+        const backToLoginLink = document.getElementById('back-to-login-link');
         const logoutBtn = document.getElementById('logout-btn');
         const userForm = document.getElementById('registro-form');
         const inventoryModal = document.getElementById('inventory-modal');
@@ -393,6 +440,12 @@
         const inventoryNav = document.getElementById('inventory-nav');
         const companySwitcher = document.getElementById('company-switcher');
         
+        const resetPasswordModal = document.getElementById('reset-password-modal');
+        const resetPasswordForm = document.getElementById('reset-password-form');
+        
+        // Flag para controlar el flujo de recuperación
+        let isRecoveringPassword = false;
+
         // Selectores para notificaciones y nombre de usuario
         const userDisplayName = document.getElementById('user-display-name');
         const notificationsBtn = document.getElementById('notifications-btn');
@@ -474,47 +527,47 @@
         const loadUserCompaniesAndInvitations = async () => {
              if (!state.user) return;
             
-            // Paso 1: Obtener las relaciones del usuario (sus membresías)
-            const { data: memberships, error: membershipError } = await supabaseClient
-                .from('company_users')
-                .select('company_id, status')
-                .eq('user_id', state.user.id);
+             // Paso 1: Obtener las relaciones del usuario (sus membresías)
+             const { data: memberships, error: membershipError } = await supabaseClient
+                 .from('company_users')
+                 .select('company_id, status')
+                 .eq('user_id', state.user.id);
 
-            if (membershipError) {
-                console.error("Error cargando membresías:", membershipError);
-                state.companies = [];
-                return;
-            }
+             if (membershipError) {
+                 console.error("Error cargando membresías:", membershipError);
+                 state.companies = [];
+                 return;
+             }
 
-            if (!memberships || memberships.length === 0) {
-                state.companies = [];
-            } else {
-                // Paso 2: Con los IDs de las empresas, obtener sus detalles
-                const companyIds = memberships.map(m => m.company_id);
-                const { data: companiesData, error: companiesError } = await supabaseClient
-                    .from('companies')
-                    .select('*')
-                    .in('id', companyIds);
+             if (!memberships || memberships.length === 0) {
+                 state.companies = [];
+             } else {
+                 // Paso 2: Con los IDs de las empresas, obtener sus detalles
+                 const companyIds = memberships.map(m => m.company_id);
+                 const { data: companiesData, error: companiesError } = await supabaseClient
+                     .from('companies')
+                     .select('*')
+                     .in('id', companyIds);
 
-                if (companiesError) {
-                    console.error("Error cargando detalles de empresas:", companiesError);
-                    state.companies = [];
-                    return;
-                }
-                
-                // Unir la información de la membresía (status) con los detalles de la empresa
-                state.companies = companiesData.map(company => {
-                    const membership = memberships.find(m => m.company_id === company.id);
-                    return { ...company, status: membership.status };
-                });
-            }
+                 if (companiesError) {
+                     console.error("Error cargando detalles de empresas:", companiesError);
+                     state.companies = [];
+                     return;
+                 }
+                 
+                 // Unir la información de la membresía (status) con los detalles de la empresa
+                 state.companies = companiesData.map(company => {
+                     const membership = memberships.find(m => m.company_id === company.id);
+                     return { ...company, status: membership.status };
+                 });
+             }
 
-            // Después de cargar, actualizamos todos los componentes que dependen de esta información.
-            populateCompanySwitcher();
-            renderNotifications();
-            if (state.currentPage === 'empresas') {
-                await renderEmpresasPage();
-            }
+             // Después de cargar, actualizamos todos los componentes que dependen de esta información.
+             populateCompanySwitcher();
+             renderNotifications();
+             if (state.currentPage === 'empresas') {
+                 await renderEmpresasPage();
+             }
         };
 
         const loadData = async () => {
@@ -1838,19 +1891,19 @@
           const acceptedCompanies = state.companies.filter(c => c.status === 'accepted');
 
           if (pendingInvitations.length > 0) {
-              invitationsContainer.innerHTML = `<h3 class="text-lg font-semibold border-b pb-2 mb-2">Invitaciones Pendientes</h3>`;
-              pendingInvitations.forEach(invite => {
-                  const inviteCard = document.createElement('div');
-                  inviteCard.className = 'p-4 border rounded-lg flex justify-between items-center bg-yellow-50';
-                  inviteCard.innerHTML = `
+               invitationsContainer.innerHTML = `<h3 class="text-lg font-semibold border-b pb-2 mb-2">Invitaciones Pendientes</h3>`;
+               pendingInvitations.forEach(invite => {
+                   const inviteCard = document.createElement('div');
+                   inviteCard.className = 'p-4 border rounded-lg flex justify-between items-center bg-yellow-50';
+                   inviteCard.innerHTML = `
                         <p>Has sido invitado a unirte a <strong>${invite.name}</strong>.</p>
                         <div class="flex gap-2">
                             <button data-company-id="${invite.id}" class="accept-invite-btn py-1 px-3 text-sm rounded-md text-white bg-green-600 hover:bg-green-700">Aceptar</button>
                             <button data-company-id="${invite.id}" class="decline-invite-btn py-1 px-3 text-sm rounded-md text-white bg-red-600 hover:bg-red-700">Rechazar</button>
                         </div>
-                  `;
-                  invitationsContainer.appendChild(inviteCard);
-              });
+                   `;
+                   invitationsContainer.appendChild(inviteCard);
+               });
           }
 
 
@@ -1867,10 +1920,10 @@
                       const statusColor = member.status === 'pending' ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-700';
                       const statusText = member.status === 'pending' ? 'Pendiente' : member.role;
                       return `
-                            <li class="flex justify-between items-center text-sm py-1">
-                                <span>${member.email}</span>
-                                <span class="text-xs font-semibold ${statusColor} px-2 py-1 rounded-full">${statusText}</span>
-                            </li>
+                          <li class="flex justify-between items-center text-sm py-1">
+                              <span>${member.email}</span>
+                              <span class="text-xs font-semibold ${statusColor} px-2 py-1 rounded-full">${statusText}</span>
+                          </li>
                       `;
                   }).join('') : '<li class="text-sm text-gray-500">Aún no hay miembros.</li>';
                   
@@ -2062,6 +2115,12 @@
 
         // --- INICIALIZACIÓN Y LOGIN ---
         const checkLogin = async () => {
+            // Si estamos en modo recuperación, no hacer nada
+            if (isRecoveringPassword) {
+                console.log("Password recovery in progress, skipping login check.");
+                return;
+            }
+
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 state.user = session.user;
@@ -2137,6 +2196,61 @@
             }
         });
 
+        // --- LÓGICA PARA RESTABLECER CONTRASEÑA ---
+        forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = forgotPasswordForm.email.value;
+            const forgotMessage = document.getElementById('forgot-message');
+            
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href,
+            });
+
+            if (error) {
+                forgotMessage.textContent = error.message;
+                forgotMessage.className = 'text-sm text-center text-red-600';
+            } else {
+                forgotMessage.textContent = 'Si existe una cuenta con este email, recibirás un enlace para restablecer tu contraseña.';
+                forgotMessage.className = 'text-sm text-center text-green-600';
+                forgotPasswordForm.reset();
+            }
+        });
+
+        resetPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = resetPasswordForm.new_password.value;
+            const confirmPassword = resetPasswordForm.confirm_password.value;
+            const errorEl = document.getElementById('reset-password-error');
+            errorEl.classList.add('hidden');
+
+            if (newPassword.length < 6) {
+                errorEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorEl.textContent = 'Las contraseñas no coinciden.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) {
+                errorEl.textContent = `Error al actualizar: ${error.message}`;
+                errorEl.classList.remove('hidden');
+            } else {
+                showToast('Contraseña actualizada con éxito.', 'success');
+                isRecoveringPassword = false; // Reseteamos el flag
+                resetPasswordModal.close();
+                // Ahora que la contraseña está establecida, procedemos a la aplicación.
+                await checkLogin();
+            }
+        });
+
         googleLoginBtn.addEventListener('click', async () => {
             const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
@@ -2153,11 +2267,27 @@
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
             loginWrapper.classList.add('hidden');
+            forgotPasswordWrapper.classList.add('hidden');
             registerWrapper.classList.remove('hidden');
         });
 
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
+            registerWrapper.classList.add('hidden');
+            forgotPasswordWrapper.classList.add('hidden');
+            loginWrapper.classList.remove('hidden');
+        });
+
+        showForgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginWrapper.classList.add('hidden');
+            registerWrapper.classList.add('hidden');
+            forgotPasswordWrapper.classList.remove('hidden');
+        });
+
+        backToLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotPasswordWrapper.classList.add('hidden');
             registerWrapper.classList.add('hidden');
             loginWrapper.classList.remove('hidden');
         });
@@ -2173,7 +2303,14 @@
 
         supabaseClient.auth.onAuthStateChange((event, session) => {
             console.log(`Auth event: ${event}`);
-            checkLogin();
+            if (event === 'PASSWORD_RECOVERY') {
+                // Activamos el flag y mostramos el modal.
+                isRecoveringPassword = true;
+                resetPasswordModal.showModal();
+            } else {
+                // Para otros eventos como SIGNED_IN, SIGNED_OUT, etc.
+                checkLogin();
+            }
         });
 
         mobileMenuBtn.addEventListener('click', () => {
@@ -2240,7 +2377,6 @@
             const companyId = deleteCompanyForm.company_id.value;
             const companyName = deleteCompanyForm.company_name.value;
 
-            // FIX: Explicitly set Authorization header to ensure authentication
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 showToast('Error de autenticación. Por favor, inicia sesión de nuevo.', 'error');
