@@ -109,12 +109,12 @@ Crea una Nueva Rama (git checkout -b feature/nombre-mejora).
 
 Realiza tus cambios y envía un Pull Request con una descripción clara.
 
-📜 Licencia
+##📜 Licencia
 Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
 
-❤️ Apoya este Proyecto
+##❤️ Apoya este Proyecto
 Si esta aplicación te ha sido de utilidad, ¡considera apoyarme con un café! Tu apoyo me motiva a seguir mejorando este proyecto.
 
-✨ Una Nota Especial
+##✨ Una Nota Especial
 Este proyecto fue desarrollado en colaboración con Gemini, una IA de Google. Sirve como un ejemplo de cómo la inteligencia artificial puede actuar como un compañero de programación, ayudando a resolver problemas, generar código y acelerar el proceso de creación.
 
