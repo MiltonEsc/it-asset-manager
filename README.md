@@ -1,154 +1,120 @@
-Gestión de Activos y Hojas de Vida TIC
+# Gestión de Activos y Hojas de Vida TIC
+
+[![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Una aplicación web completa para la gestión centralizada del inventario tecnológico (equipos, software, periféricos), el seguimiento de hojas de vida de usuarios y el registro de mantenimientos en un entorno multiempresa.
 
-<p align="center">
-<a href="https://it-asset-manager.netlify.app/" target="_blank">
-<img src="https://placehold.co/800x400/e2e8f0/667eea?text=Ver+Demo+en+Vivo" alt="Captura de pantalla de la aplicación"/>
-</a>
-</p>
+**[Ver Demo en Vivo →](it-asset-manager.netlify.app)**
 
-<p align="center">
-<a href="https://it-asset-manager.netlify.app/" target="_blank">
-<strong>Ver Demo en Vivo &rarr;</strong>
-</a>
-</p>
+## Tabla de Contenidos
 
-✨ Características Principales
-🏢 Gestión Multiempresa: Crea, gestiona e invita a usuarios a múltiples empresas desde una sola cuenta.
+1.  [Características Principales](#-características-principales)
+2.  [Tecnologías Utilizadas](#-tecnologías-utilizadas)
+3.  [Instalación y Puesta en Marcha](#-instalación-y-puesta-en-marcha)
+4.  [¿Cómo Colaborar?](#-cómo-colaborar)
+5.  [Licencia](#-licencia)
+6.  [Apoya este Proyecto](#️-apoya-este-proyecto)
+7.  [Una Nota Especial](#-una-nota-especial)
 
-💻 Inventario Completo: Registra y clasifica equipos, software y periféricos con detalles de compra, garantía y costos.
+## ✨ Características Principales
 
-👤 Hojas de Vida de Usuarios: Asigna activos a los usuarios, registra fechas de ingreso, cargos y gestiona sus perfiles.
+* **🏢 Gestión Multiempresa:** Crea, gestiona e invita a usuarios a múltiples empresas desde una sola cuenta.
+* **💻 Inventario Completo:** Registra y clasifica equipos, software y periféricos con detalles de compra, garantía y costos.
+* **👤 Hojas de Vida de Usuarios:** Asigna activos a los usuarios, registra fechas de ingreso, cargos y gestiona sus perfiles.
+* **🛠️ Registro de Mantenimiento:** Lleva un historial detallado de todos los mantenimientos realizados a los equipos.
+* **📊 Dashboard y Reportes:** Visualiza métricas clave de tu inventario con gráficos interactivos.
+* **🔄 Importación/Exportación CSV:** Carga o exporta masivamente datos de usuarios y activos.
+* **📄 Exportación a PDF:** Genera hojas de vida completas de los usuarios en formato PDF con un solo clic.
+* **🔐 Autenticación Segura:** Sistema de inicio de sesión y registro utilizando Supabase Auth, con opción para proveedores como Google.
 
-🛠️ Registro de Mantenimiento: Lleva un historial detallado de todos los mantenimientos realizados a los equipos, incluyendo descripciones y evidencias.
+## 🚀 Tecnologías Utilizadas
 
-📊 Dashboard y Reportes: Visualiza métricas clave de tu inventario, como el estado de los equipos, licencias por vencer y costos totales.
+* **Frontend:** HTML5, Tailwind CSS, JavaScript (Vanilla JS)
+* **Backend y Base de Datos:** Supabase (Postgres, Auth, Storage, Edge Functions)
+* **Librerías Adicionales:**
+    * `Chart.js` para gráficos y reportes.
+    * `jsPDF` y `jsPDF-AutoTable` para la exportación de PDFs.
 
-🔄 Importación/Exportación CSV: Carga masivamente datos de usuarios y activos o exporta tus inventarios a formato CSV.
+## 🔧 Instalación y Puesta en Marcha
 
-📄 Exportación a PDF: Genera hojas de vida completas de los usuarios en formato PDF con un solo clic.
+Para ejecutar este proyecto localmente, sigue estos pasos:
 
-🔐 Autenticación Segura: Sistema de inicio de sesión y registro de usuarios utilizando Supabase Auth.
+**1. Clona el Repositorio**
+```bash
+git clone https://github.com/MiltonEsc/it-asset-manager.git
+```
+**2. Configura tu Proyecto en Supabase**
 
-🚀 Tecnologías Utilizadas
-Frontend: HTML5, Tailwind CSS, JavaScript (Vanilla JS)
+Ve a Supabase.io y crea un nuevo proyecto.
 
-Backend y Base de Datos: Supabase (Base de datos Postgres, Autenticación, Storage)
+Guarda tu URL del Proyecto y tu clave anon public de la sección Project Settings > API.
 
-Librerías Adicionales:
+**3. Ejecuta el Esquema de la Base de Datos**
 
-Chart.js para gráficos y reportes.
+Dentro de tu proyecto en Supabase, ve a SQL Editor.
 
-jsPDF y jsPDF-AutoTable para la exportación de PDFs.
+Abre el archivo **schema.sql** de este repositorio, copia su contenido, pégalo en el editor y haz clic en "RUN".
 
-🔧 Instalación y Puesta en Marcha
-Para ejecutar este proyecto, necesitas configurarlo con tu propia instancia de Supabase.
+**4. Configura el Almacenamiento (Storage)**
 
-Clona el repositorio:
+En el dashboard de Supabase, ve a Storage y crea los siguientes buckets con acceso público: activos, facturas, evidencias.
 
-1. git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-2. Crea tu proyecto en Supabase:
+Vuelve a SQL Editor, abre **storage_schema.sql**, copia el contenido, pégalo y ejecútalo para crear las políticas de seguridad.
 
-  2.1 Ve a Supabase.io y crea un nuevo proyecto.
+**5. Despliega las Edge Functions (con Supabase CLI)**
 
-  2.2 En el dashboard de tu proyecto, ve a la sección SQL Editor.
+Instala la CLI de Supabase en la terminal.
+[Documentacion de Supabase](https://supabase.com/docs/guides/local-development/cli/getting-started)
 
-  2.3 Abre el archivo schema.sql de este repositorio, copia todo su contenido, pégalo en el editor de Supabase y haz clic en "RUN". Esto creará todas las tablas, funciones y políticas de seguridad necesarias.
+Inicia sesión y vincula tu proyecto:
 
-3. Ve a la sección Storage y crea los buckets necesarios con acceso público: activos, facturas, evidencias.
+```bash
+supabase login
+```
+```bash
+supabase link --project-ref TU_PROJECT_REF
+```
+**Despliega las funciones:**
 
-  3.1 Abre el archivo storage_schema.sql de este repositorio, copia todo su contenido, pégalo en el editor de Supabase y haz clic en "RUN". Esto creará todas las políticas de los buckets necesarias.
+```bash
+supabase functions deploy
+```
+**6. Configura las Claves publicas**
 
-4. Instalar la CLI de Supabase
-Si aún no la tienes, primero debes instalar la Command Line Interface (CLI) de Supabase. Puedes encontrar las instrucciones detalladas y actualizadas para tu sistema operativo directamente en la documentación oficial de Supabase.
+Abre el archivo index.html.
 
-5. Desplegar las Edge Functions
-Ahora que tienes la CLI y estás dentro de la carpeta supabase, sigue estos pasos para desplegar las funciones.
+Busca y reemplaza los valores de SUPABASE_URL y SUPABASE_KEY con tus credenciales:
 
-  5.1. Inicia sesión en la CLI de Supabase
-  Este comando te conectará con tu cuenta de Supabase.
-  
-  supabase login
-  Esto abrirá tu navegador para que autorices el acceso.
+JavaScript
 
-  5.2 Vincula tu carpeta local con tu proyecto remoto
-  Necesitas el Project Ref (la ID de tu proyecto), que puedes encontrar en el panel de control de Supabase, en Project Settings > General.
+// --- CONFIGURACIÓN DE SUPABASE ---
+const SUPABASE_URL = 'URL_DE_TU_PROYECTO_SUPABASE';
+const SUPABASE_KEY = 'TU_CLAVE_PUBLICA_ANON';
+**7. Configura las URLs de Redirección**
 
-  Reemplaza 'TU_PROJECT_REF' con la ID de tu proyecto
-  
-  supabase link --project-ref TU_PROJECT_REF
-  La CLI te pedirá la contraseña de tu base de datos para verificar la conexión.
+En Supabase, ve a Authentication > URL Configuration.
 
-  5.3 Verifica la conexión (Opcional pero recomendado)
-  Asegúrate de que estás conectado al proyecto correcto.
+En Site URL, introduce la URL de tu aplicación (ej: http://localhost:3000).
 
-  supabase status
-  Este comando te mostrará la información del proyecto remoto al que estás vinculado actualmente. 
-
-  5.4 Ahora sí, despliega tus funciones
-  Con tu proyecto ya vinculado, despliega todas tus funciones con este comando.
-
-  supabase functions deploy
-
-6. Configura las claves de Supabase en el código:
-
-  6.1 Abre el archivo index.html.
-  Busca la sección // --- CONFIGURACIÓN DE SUPABASE --- en el script.
-  Deberás reemplazar SUPABASE_URL y SUPABASE_KEY con las credenciales de tu proyecto.
- 
- ¿Cómo buscar la API Key y la URL en Supabase?
- 
- Dentro de tu proyecto en Supabase, ve a Project Settings (el ícono de engranaje en el menú lateral izquierdo).
-
-  Selecciona la pestaña API.
-
-  En la sección Project URL, encontrarás la URL que necesitas. Cópiala.
-
-  En la sección Project API Keys, copia la clave que dice anon y public. Importante: No uses la clave service_role en el frontend por seguridad.
-
-  Pega las credenciales en tu código JavaScript
-
-const SUPABASE_URL = 'URL_DE_TU_PROYECTO_SUPABASE'; // Pega aquí la URL
-const SUPABASE_KEY = 'TU_CLAVE_PUBLICA_ANON';      // Pega aquí la clave anon public
-
-(Opcional) Habilitar autenticación con Google:
-
-Si deseas permitir que los usuarios se registren o inicien sesión con su cuenta de Google, ve a la sección Authentication > Providers en tu dashboard de Supabase.
-
-Busca Google en la lista y habilítalo.
-
-Deberás seguir las instrucciones para configurar tus credenciales de cliente OAuth desde la Google Cloud Console. Puedes encontrar una guía detallada en la documentación de Supabase.
-
-(Opcional) Redireccionar la URL a tu servidor:
-
-Por defecto, después de acciones como la confirmación de correo o el inicio de sesión, Supabase redirige a su propia URL. Para que los usuarios regresen a tu sitio web, ve a Authentication > URL Configuration.
-
-En el campo Site URL, introduce la URL donde tendrás alojada la aplicación (por ejemplo, http://localhost:3000 para desarrollo local o https://tu-dominio.com para producción).
-
-¡Listo! Abre el archivo index.html en tu navegador para empezar a usar la aplicación.
+¡Listo! Abre el archivo index.html en tu navegador para empezar.
 
 🤝 ¿Cómo Colaborar?
-¡Gracias por tu interés en colaborar! Toda ayuda es bienvenida. Si quieres contribuir al proyecto, por favor sigue estos pasos:
+¡Gracias por tu interés en colaborar!
 
-Reporta Bugs o Sugiere Mejoras: Si encuentras un error o tienes una idea para una nueva funcionalidad, por favor abre un "Issue" para que podamos discutirlo. (Nota: si el repositorio es privado, necesitarás invitar a los colaboradores para que puedan ver y crear issues).
+Reporta Bugs o Sugiere Mejoras: Abre un nuevo "Issue".
 
-Haz un Fork del Repositorio: Crea una copia del proyecto en tu propia cuenta de GitHub.
+Haz un Fork del repositorio.
 
-Crea una Nueva Rama:
+Crea una Nueva Rama (git checkout -b feature/nombre-mejora).
 
-Bash
+Realiza tus cambios y envía un Pull Request con una descripción clara.
 
-git checkout -b feature/nombre-de-tu-mejora
-Realiza tus Cambios: Escribe tu código y asegúrate de que todo funcione correctamente.
-
-Envía un Pull Request: Una vez que termines, envía un "Pull Request" desde tu rama a la rama main de este repositorio. Por favor, incluye una descripción clara de los cambios que realizaste.
+📜 Licencia
+Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
 
 ❤️ Apoya este Proyecto
-Si esta aplicación te ha sido de utilidad, te ha ahorrado tiempo o te ha ayudado a aprender, ¡considera apoyarme con un café! Tu apoyo me motiva a seguir manteniendo y mejorando este proyecto.
-
-<a href='https://ko-fi.com/miltondemo' target='_blank'>
-<img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' />
-</a>
+Si esta aplicación te ha sido de utilidad, ¡considera apoyarme con un café! Tu apoyo me motiva a seguir mejorando este proyecto.
 
 ✨ Una Nota Especial
 Este proyecto fue desarrollado en colaboración con Gemini, una IA de Google. Sirve como un ejemplo de cómo la inteligencia artificial puede actuar como un compañero de programación, ayudando a resolver problemas, generar código y acelerar el proceso de creación.
+
