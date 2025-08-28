@@ -12,8 +12,8 @@ Una aplicación web completa para la gestión centralizada del inventario tecnol
 2.  [Tecnologías Utilizadas](#-tecnologías-utilizadas)
 3.  [Instalación y Puesta en Marcha](#-instalación-y-puesta-en-marcha)
 4.  [¿Cómo Colaborar?](#-cómo-colaborar)
-5.  [Licencia](#-licencia)
-6.  [Apoya este Proyecto](#️-apoya-este-proyecto)
+5.  [Licencia](#-Licencia)
+6.  [Apoya este Proyecto](#-apoya-este-proyecto)
 7.  [Una Nota Especial](#-una-nota-especial)
 
 ## ✨ Características Principales
