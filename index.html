@@ -12,6 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SDK de PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         select[multiple] { background-image: none; }
@@ -154,14 +156,22 @@
                                 <a data-page="empresas" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Empresas</a>
                                 <a data-page="proveedores" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Proveedores</a>
                                 <a data-page="registro" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Registrar Usuario</a>
+                                <!-- NUEVO LINK DE DEPRECIACIÓN -->
+                                <a data-page="depreciacion" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Depreciación</a>
                             </div>
                         </div>
 
                         <a data-page="reportes" class="nav-link">Reportes</a>
+                        <a data-page="donacion" class="nav-link">Donación</a>
                     </nav>
 
                     <!-- Derecha: Acciones de Usuario y Menú Móvil -->
                     <div class="flex items-center gap-4">
+                        <!-- Botón de Donación -->
+                        <button id="header-donate-btn" class="py-2 px-3 text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
+                            <span>Apoya este proyecto</span>
+                        </button>
                         <!-- Notificaciones -->
                         <div class="relative">
                             <button id="notifications-btn" class="relative text-gray-600 hover:text-gray-800 focus:outline-none">
@@ -201,7 +211,9 @@
                     <a data-page="empresas" class="nav-link">Empresas</a>
                     <a data-page="proveedores" class="nav-link">Proveedores</a>
                     <a data-page="registro" class="nav-link">Registrar Usuario</a>
+                    <a data-page="depreciacion" class="nav-link">Depreciación</a>
                     <a data-page="reportes" class="nav-link">Reportes</a>
+                    <a data-page="donacion" class="nav-link">Donación</a>
                 </nav>
             </div>
         </header>
@@ -291,6 +303,43 @@
                 </div>
             </div>
 
+            <!-- ===== NUEVA PÁGINA DE DEPRECIACIÓN ===== -->
+            <div id="page-depreciacion" class="page">
+                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-7xl mx-auto">
+                    <h2 class="text-2xl font-semibold mb-4">Reporte de Depreciación de Activos</h2>
+                    <p class="text-sm text-gray-600 mb-6">Este reporte muestra el valor en libros actual de todos los equipos, calculado por el método de línea recta.</p>
+                    <div id="depreciation-table-container" class="overflow-x-auto"></div>
+                </div>
+            </div>
+
+            <!-- PÁGINA DE DONACIÓN -->
+            <div id="page-donacion" class="page">
+                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-2xl mx-auto text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                    </svg>
+                    <h2 class="text-3xl font-bold mt-4 text-gray-800">Apoya Nuestro Trabajo</h2>
+                    <p class="mt-4 text-gray-600">
+                        Esta aplicación es desarrollada y mantenida gracias al apoyo de usuarios como tú. Si encuentras útil esta herramienta, considera hacer una donación para ayudarnos a cubrir los costos de desarrollo, servidores y futuras mejoras.
+                    </p>
+                    <p class="mt-2 text-gray-600">
+                        ¡Cada contribución, sin importar el tamaño, es enormemente apreciada!
+                    </p>
+                    <div class="mt-8">
+                        <button id="main-donate-btn" class="w-full sm:w-auto py-3 px-8 text-lg font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors">
+                            Hacer una Donación
+                        </button>
+                    </div>
+                    <div id="paypal-button-container" class="mt-6 max-w-sm mx-auto">
+                        <!-- El botón de PayPal se renderizará aquí -->
+                    </div>
+                     <div id="donation-success-message" class="hidden mt-6 p-4 bg-green-100 text-green-800 rounded-lg">
+                        <h4 class="font-bold">¡Gracias por tu apoyo!</h4>
+                        <p>Tu donación ha sido recibida. Realmente apreciamos tu generosidad.</p>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -364,11 +413,10 @@
         </form>
     </dialog>
 
-    <!-- ===== NUEVO: Modal para Restablecer Contraseña ===== -->
+    <!-- Modal para Restablecer Contraseña -->
     <dialog id="reset-password-modal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
         <div class="sticky top-0 bg-white p-4 flex justify-between items-center border-b">
             <h3 class="text-xl font-semibold">Establecer Nueva Contraseña</h3>
-            <!-- No hay botón de cierre para forzar la acción del usuario -->
         </div>
         <form id="reset-password-form" class="p-6 space-y-4">
             <p class="text-sm text-gray-600">Has seguido un enlace para restablecer tu contraseña. Por favor, introduce tu nueva contraseña a continuación.</p>
@@ -387,9 +435,31 @@
         </form>
     </dialog>
     
+    <!-- Modal para Donación -->
+    <dialog id="donate-modal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
+        <div class="sticky top-0 bg-white p-4 flex justify-between items-center border-b">
+            <h3 class="text-xl font-semibold">Elige un monto para donar</h3>
+            <button class="modal-close-btn text-2xl leading-none">&times;</button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-3 gap-4">
+                <button data-amount="5" class="donate-amount-btn py-3 px-2 border rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500">$5</button>
+                <button data-amount="10" class="donate-amount-btn py-3 px-2 border rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500">$10</button>
+                <button data-amount="20" class="donate-amount-btn py-3 px-2 border rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500">$20</button>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">O ingresa un monto personalizado (USD)</label>
+                <input type="number" id="custom-donate-amount" min="1" step="1" placeholder="Ej: 15" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+            </div>
+            <div class="text-right">
+                <button id="confirm-donation-btn" class="py-2 px-6 text-white bg-green-600 hover:bg-green-700 rounded-md">Continuar al Pago</button>
+            </div>
+        </div>
+    </dialog>
+
     <!-- Plantillas -->
     <template id="user-card-template"><div class="bg-white rounded-xl shadow-lg p-6 flex flex-col"><div class="flex-grow"><h3 class="font-bold text-lg text-gray-900"></h3><p class="text-sm text-gray-600 mb-4"></p><div class="pt-4 border-t border-gray-200 text-sm space-y-2"><p><strong>Departamento:</strong> <span class="departamento"></span></p><p><strong>Cédula:</strong> <span class="cedula"></span></p><p><strong>Equipo:</strong> <span class="equipo"></span></p></div></div><div class="mt-4 pt-4 border-t border-gray-100 text-right space-x-2"><button class="edit-user-btn text-sm font-medium text-blue-600 hover:text-blue-800">Editar</button><button class="delete-user-btn text-sm font-medium text-red-600 hover:text-red-800">Eliminar</button><button class="view-user-btn text-sm font-medium text-indigo-600 hover:text-indigo-800">Ver Hoja de Vida &rarr;</button></div></div></template>
-    <template id="equipo-form-template"><input type="hidden" name="id"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2">Detalles del Equipo</h4><div><label class="block text-sm">Marca</label><input type="text" name="marca" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Modelo</label><input type="text" name="modelo" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Número de Serie</label><input type="text" name="numero_serie" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Estado</label><select name="estado" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"><option>Bueno</option><option>Regular</option><option>Malo</option><option>En reparación</option></select></div><div class="md:col-span-2"><label class="block text-sm">Ubicación</label><input type="text" name="ubicacion" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2 mt-4">Información de Compra</h4><div><label class="block text-sm">Proveedor</label><select name="proveedor_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></select></div><div><label class="block text-sm">Número de Factura</label><input type="text" name="numero_factura" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Fecha de Compra</label><input type="date" name="fecha_compra" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Vencimiento de Garantía</label><input type="date" name="fecha_vencimiento_garantia" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Costo</label><input type="number" name="costo" step="0.01" placeholder="0.00" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm">Imagen del Activo</label><input type="file" name="imagen" accept="image/*" class="mt-1 w-full text-sm"></div><div><label class="block text-sm">Factura (PDF)</label><input type="file" name="factura_pdf" accept="application/pdf" class="mt-1 w-full text-sm"></div></div></div><div class="text-right mt-4"><button type="submit" class="py-2 px-6 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Guardar</button></div></template>
+    <template id="equipo-form-template"><input type="hidden" name="id"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2">Detalles del Equipo</h4><div><label class="block text-sm">Marca</label><input type="text" name="marca" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Modelo</label><input type="text" name="modelo" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Número de Serie</label><input type="text" name="numero_serie" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Estado</label><select name="estado" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"><option>Bueno</option><option>Regular</option><option>Malo</option><option>En reparación</option></select></div><div class="md:col-span-2"><label class="block text-sm">Ubicación</label><input type="text" name="ubicacion" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2 mt-4">Información de Compra y Depreciación</h4><div><label class="block text-sm">Proveedor</label><select name="proveedor_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></select></div><div><label class="block text-sm">Número de Factura</label><input type="text" name="numero_factura" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Fecha de Compra</label><input type="date" name="fecha_compra" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Vencimiento de Garantía</label><input type="date" name="fecha_vencimiento_garantia" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Costo</label><input type="number" name="costo" step="0.01" placeholder="0.00" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Vida Útil (años)</label><input type="number" name="vida_util" placeholder="Ej: 5" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Valor Residual</label><input type="number" name="valor_residual" step="0.01" placeholder="0.00" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm">Imagen del Activo</label><input type="file" name="imagen" accept="image/*" class="mt-1 w-full text-sm"></div><div><label class="block text-sm">Factura (PDF)</label><input type="file" name="factura_pdf" accept="application/pdf" class="mt-1 w-full text-sm"></div></div></div><div class="text-right mt-4"><button type="submit" class="py-2 px-6 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Guardar</button></div></template>
     <template id="software-form-template"><input type="hidden" name="id"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2">Detalles del Software</h4><div><label class="block text-sm">Nombre del Software</label><input type="text" name="nombre" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Tipo de Software</label><input type="text" name="tipo" placeholder="Ej: Ofimática, Diseño" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Versión</label><input type="text" name="version" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Licencias (Stock)</label><input type="number" name="stock" value="1" min="0" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2 mt-4">Información de Compra</h4><div><label class="block text-sm">Proveedor</label><select name="proveedor_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></select></div><div><label class="block text-sm">Número de Factura</label><input type="text" name="numero_factura" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Fecha de Compra</label><input type="date" name="fecha_compra" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Vencimiento de Licencia</label><input type="date" name="fecha_vencimiento" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Costo</label><input type="number" name="costo" step="0.01" placeholder="0.00" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div class="md:col-span-2"><label class="block text-sm">Icono o Imagen del Software</label><input type="file" name="imagen" accept="image/*" class="mt-1 w-full text-sm"></div></div><div class="text-right mt-4"><button type="submit" class="py-2 px-6 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Guardar</button></div></template>
     <template id="periferico-form-template"><input type="hidden" name="id"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2">Detalles del Periférico</h4><div><label class="block text-sm">Tipo de Periférico</label><input type="text" name="tipo" required placeholder="Ej: Monitor, Teclado" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Marca</label><input type="text" name="marca" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Modelo</label><input type="text" name="modelo" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Número de Serie</label><input type="text" name="numero_serie" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Estado</label><select name="estado" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"><option>Bueno</option><option>Regular</option><option>Malo</option></select></div><h4 class="md:col-span-2 text-lg font-medium text-gray-800 border-b pb-2 mt-4">Información de Compra</h4><div><label class="block text-sm">Proveedor</label><select name="proveedor_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></select></div><div><label class="block text-sm">Número de Factura</label><input type="text" name="numero_factura" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Fecha de Compra</label><input type="date" name="fecha_compra" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Vencimiento de Garantía</label><input type="date" name="fecha_vencimiento_garantia" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Costo</label><input type="number" name="costo" step="0.01" placeholder="0.00" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div class="md:col-span-2"><label class="block text-sm">Imagen del Activo</label><input type="file" name="imagen" accept="image/*" class="mt-1 w-full text-sm"></div></div><div class="text-right mt-4"><button type="submit" class="py-2 px-6 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Guardar</button></div></template>
     <template id="maintenance-form-template"><input type="hidden" name="id"><div><label class="block text-sm">Equipo</label><select name="equipo_id" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></select></div><div><label class="block text-sm">Fecha de Mantenimiento</label><input type="date" name="fecha" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Técnico Responsable</label><input type="text" name="tecnico" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label class="block text-sm">Descripción del Trabajo</label><textarea name="descripcion" rows="3" required class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></textarea></div><div><label class="block text-sm">Evidencia (Imagen o PDF)</label><input type="file" name="imagen" accept="image/*,application/pdf" class="mt-1 w-full text-sm"></div><div class="text-right mt-4"><button type="submit" class="py-2 px-6 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md">Guardar</button></div></template>
@@ -399,8 +469,9 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- CONFIGURACIÓN DE SUPABASE ---
-        const SUPABASE_URL = 'https://gjnqgsevwhebzcqiggex.supabase.co'; // <-- TU URL DE SUPABASE
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqbnFnc2V2d2hlYnpjcWlnZ2V4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMDE0MDYsImV4cCI6MjA3MTg3NzQwNn0.VZ-5nnU0ObZDe-ckk0-j_REAdJ6NIZvTMeGbt9EWd70'; // <-- TU CLAVE PÚBLICA
+        // IMPORTANTE: Reemplaza con tus propias credenciales de Supabase
+        const SUPABASE_URL = 'https://gjnqgsevwhebzcqiggex.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqbnFnc2V2d2hlYnpjcWlnZ2V4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMDE0MDYsImV4cCI6MjA3MTg3NzQwNn0.VZ-5nnU0ObZDe-ckk0-j_REAdJ6NIZvTMeGbt9EWd70'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // --- SELECTORES DOM ---
@@ -443,17 +514,21 @@
         const resetPasswordModal = document.getElementById('reset-password-modal');
         const resetPasswordForm = document.getElementById('reset-password-form');
         
-        // Flag para controlar el flujo de recuperación
+        // --- Selectores para Donación ---
+        const donateModal = document.getElementById('donate-modal');
+        const headerDonateBtn = document.getElementById('header-donate-btn');
+        const mainDonateBtn = document.getElementById('main-donate-btn');
+        const confirmDonationBtn = document.getElementById('confirm-donation-btn');
+        const customDonateAmountInput = document.getElementById('custom-donate-amount');
+
         let isRecoveringPassword = false;
 
-        // Selectores para notificaciones y nombre de usuario
         const userDisplayName = document.getElementById('user-display-name');
         const notificationsBtn = document.getElementById('notifications-btn');
         const notificationCount = document.getElementById('notification-count');
         const notificationsPanel = document.getElementById('notifications-panel');
         const notificationsList = document.getElementById('notifications-list');
 
-        // Selectores para el menú móvil
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
 
@@ -473,8 +548,8 @@
 
         // --- ESTADO DE LA APLICACIÓN ---
         let state = {
-            user: null, // Objeto del usuario autenticado
-            companies: [], // Todas las relaciones company_user (incluye pendientes y aceptadas)
+            user: null,
+            companies: [],
             activeCompanyId: null,
             registros: [],
             inventario: { equipos: [], software: [], perifericos: [] },
@@ -491,11 +566,6 @@
         
         // --- FUNCIONES DE UTILIDAD Y VERIFICACIÓN ---
 
-        /**
-         * Muestra una notificación temporal (toast) en la pantalla.
-         * @param {string} message - El mensaje a mostrar.
-         * @param {string} [type='info'] - El tipo de notificación ('info', 'success', 'error').
-         */
         const showToast = (message, type = 'info') => {
             const toast = document.createElement('div');
             const bgColor = type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-blue-600' : 'bg-green-600');
@@ -507,15 +577,11 @@
             }, 4000);
         }
 
-        /**
-         * Verifica si el usuario tiene una empresa activa. Si no, muestra un toast y redirige.
-         * @returns {boolean} - true si hay una empresa activa, false en caso contrario.
-         */
         const verificarEmpresaActiva = () => {
             const acceptedCompanies = state.companies.filter(c => c.status === 'accepted');
             if (acceptedCompanies.length === 0 || !state.activeCompanyId) {
                 showToast('Primero debes crear o unirte a una empresa.', 'error');
-                showPage('empresas'); // Redirige al usuario a la página de gestión de empresas
+                showPage('empresas');
                 return false;
             }
             return true;
@@ -523,11 +589,9 @@
 
         // --- FUNCIONES DE PERSISTENCIA (SUPABASE) ---
 
-        // Carga todas las relaciones (pendientes, aceptadas) y actualiza el estado global.
         const loadUserCompaniesAndInvitations = async () => {
              if (!state.user) return;
             
-             // Paso 1: Obtener las relaciones del usuario (sus membresías)
              const { data: memberships, error: membershipError } = await supabaseClient
                  .from('company_users')
                  .select('company_id, status')
@@ -542,7 +606,6 @@
              if (!memberships || memberships.length === 0) {
                  state.companies = [];
              } else {
-                 // Paso 2: Con los IDs de las empresas, obtener sus detalles
                  const companyIds = memberships.map(m => m.company_id);
                  const { data: companiesData, error: companiesError } = await supabaseClient
                      .from('companies')
@@ -555,14 +618,12 @@
                      return;
                  }
                  
-                 // Unir la información de la membresía (status) con los detalles de la empresa
                  state.companies = companiesData.map(company => {
                      const membership = memberships.find(m => m.company_id === company.id);
                      return { ...company, status: membership.status };
                  });
              }
 
-             // Después de cargar, actualizamos todos los componentes que dependen de esta información.
              populateCompanySwitcher();
              renderNotifications();
              if (state.currentPage === 'empresas') {
@@ -573,11 +634,10 @@
         const loadData = async () => {
             if (!state.activeCompanyId) {
                 console.log("No hay empresa activa, no se cargan datos.");
-                // Limpiar el estado si no hay empresa seleccionada
                 state.registros = [];
                 state.inventario = { equipos: [], software: [], perifericos: [] };
                 state.proveedores = [];
-                renderAll(); // Renderizar con el estado vacío
+                renderAll();
                 return;
             }
             console.log("Cargando datos para la empresa:", state.activeCompanyId);
@@ -607,10 +667,9 @@
             const tableName = type === 'software' ? 'software' : type + 's';
             try {
                 data.company_id = state.activeCompanyId;
-                let response; // Para guardar la respuesta de Supabase
+                let response;
 
                 if (data.id) {
-                    // --- LÓGICA DE ACTUALIZACIÓN ---
                     const itemId = data.id;
                     delete data.id; 
                     response = await supabaseClient
@@ -619,7 +678,6 @@
                         .eq('id', itemId);
 
                 } else {
-                    // --- LÓGICA DE INSERCIÓN ---
                     delete data.id;
                     response = await supabaseClient
                         .from(tableName)
@@ -668,7 +726,6 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(`page-${pageId}`).classList.add('active');
             
-            // Sincronizar estado activo en ambos menús (desktop y móvil)
             document.querySelectorAll('.nav-link, .dropdown-panel a').forEach(l => {
                 l.classList.remove('active');
                 l.closest('.dropdown')?.querySelector('.dropdown-toggle')?.classList.remove('active');
@@ -698,6 +755,7 @@
             renderInventoryTables();
             renderMaintenanceTable();
             renderProviderTable();
+            renderDepreciationPage();
             renderReportsPage();
             await renderEmpresasPage();
             populateUserFormSelects();
@@ -1067,7 +1125,7 @@
                 <div class="md:col-span-2 space-y-2">
                     <h4 class="font-semibold text-lg border-b pb-1">Información General</h4>`;
             for(const [key, value] of Object.entries(asset)) {
-                if(!['id', 'trazabilidad', 'imagen', 'proveedor_id', 'numero_factura', 'fecha_compra', 'fecha_vencimiento_garantia', 'fecha_vencimiento', 'factura_pdf_url', 'company_id'].includes(key)) {
+                if(!['id', 'trazabilidad', 'imagen', 'proveedor_id', 'numero_factura', 'fecha_compra', 'fecha_vencimiento_garantia', 'fecha_vencimiento', 'factura_pdf_url', 'company_id', 'vida_util', 'valor_residual'].includes(key)) {
                     detailsHtml += `<p class="text-sm"><strong class="capitalize">${key.replace(/_/g, ' ')}:</strong> ${value || 'N/A'}</p>`;
                 }
             }
@@ -1080,7 +1138,44 @@
                 ${asset.fecha_vencimiento ? `<p class="text-sm"><strong>Licencia Vence:</strong> ${new Date(asset.fecha_vencimiento).toLocaleDateString('es-CO', {timeZone: 'UTC'})}</p>` : ''}
             `;
 
-            detailsHtml += `</div></div><hr class="my-6"><h4 class="font-semibold text-lg mb-2">Historial del Activo</h4>`;
+            detailsHtml += `</div></div>`;
+            
+            // --- NUEVO: Bloque de Depreciación ---
+            let depreciationHtml = '';
+            if (assetType === 'equipo') {
+                const depreciationData = calculateDepreciation(asset);
+                if (depreciationData) {
+                    depreciationHtml = `
+                        <hr class="my-6">
+                        <h4 class="font-semibold text-lg mb-2">Análisis de Depreciación (Línea Recta)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="font-medium text-gray-600">Depreciación Anual</p>
+                                <p class="text-lg font-bold text-gray-800">${formatCurrency(depreciationData.depreciacionAnual)}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="font-medium text-gray-600">Depreciación Acumulada</p>
+                                <p class="text-lg font-bold text-red-600">${formatCurrency(depreciationData.depreciacionAcumulada)}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="font-medium text-gray-600">Valor en Libros Actual</p>
+                                <p class="text-lg font-bold text-green-600">${formatCurrency(depreciationData.valorEnLibros)}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Cálculo basado en una vida útil de ${asset.vida_util} años y ${depreciationData.tiempoTranscurrido.toFixed(2)} años transcurridos desde la compra.</p>
+                    `;
+                } else {
+                     depreciationHtml = `
+                        <hr class="my-6">
+                        <h4 class="font-semibold text-lg mb-2">Análisis de Depreciación</h4>
+                        <p class="text-sm text-gray-500">No hay suficientes datos (costo, fecha de compra, vida útil) para calcular la depreciación de este activo.</p>
+                    `;
+                }
+            }
+            detailsHtml += depreciationHtml;
+            // --- FIN Bloque de Depreciación ---
+
+            detailsHtml += `<hr class="my-6"><h4 class="font-semibold text-lg mb-2">Historial del Activo</h4>`;
             detailsHtml += `<div class="overflow-y-auto max-h-64"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acción</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Detalle</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Evidencia</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
             if (asset.trazabilidad && asset.trazabilidad.length > 0) {
                 [...asset.trazabilidad].reverse().forEach(log => {
@@ -1129,19 +1224,17 @@
 
         // --- MANEJO DE EVENTOS ---
         
-        // Evento unificado para navegación (desktop y móvil)
         document.getElementById('app-container').addEventListener('click', e => {
             const link = e.target.closest('a[data-page]');
             if (link) {
                 e.preventDefault();
                 const page = link.dataset.page;
                 
-                // Lista de páginas que requieren una empresa activa
-                const protectedPages = ['hojas-de-vida', 'inventario', 'mantenimiento', 'proveedores', 'registro', 'reportes'];
+                const protectedPages = ['hojas-de-vida', 'inventario', 'mantenimiento', 'proveedores', 'registro', 'reportes', 'depreciacion'];
                 
                 if (protectedPages.includes(page)) {
                     if (!verificarEmpresaActiva()) {
-                        return; // Detiene la navegación si no hay empresa
+                        return;
                     }
                 }
                 showPage(page);
@@ -1156,17 +1249,15 @@
             const target = e.target.closest('button');
             if (!target) return;
 
-            // --- Verificación centralizada para acciones que requieren una empresa ---
             const requiresCompany = target.matches('.add-inventory-btn') ||
-                                  target.matches('#add-maintenance-btn') ||
-                                  target.matches('#add-provider-btn') ||
-                                  target.matches('.import-csv-btn') ||
-                                  target.matches('#import-users-btn');
+                                    target.matches('#add-maintenance-btn') ||
+                                    target.matches('#add-provider-btn') ||
+                                    target.matches('.import-csv-btn') ||
+                                    target.matches('#import-users-btn');
 
             if (requiresCompany && !verificarEmpresaActiva()) {
-                return; // Detiene la ejecución si no hay una empresa activa
+                return;
             }
-            // --- Fin de la verificación ---
 
             if (target.matches('.add-inventory-btn')) openInventoryModal(target.dataset.type);
             if (target.matches('.edit-inventory-btn')) openInventoryModal(target.dataset.type, target.dataset.id);
@@ -1186,7 +1277,6 @@
             if (target.matches('#add-company-btn')) companyModal.showModal();
             if (target.matches('.invite-user-btn')) openInviteModal(target.dataset.companyId);
             
-            // Flujo para aceptar invitación
             if (target.matches('.accept-invite-btn')) {
                 const companyId = target.dataset.companyId;
                 const { data, error } = await supabaseClient.functions.invoke('accept-invitation', {
@@ -1203,7 +1293,6 @@
                 }
             }
 
-            // Flujo para rechazar invitación
             if (target.matches('.decline-invite-btn')) {
                 const companyId = target.dataset.companyId;
                 openConfirmModal('¿Estás seguro de que quieres rechazar esta invitación?', async () => {
@@ -1222,14 +1311,12 @@
                 });
             }
 
-            // Flujo para eliminar empresa
             if (target.matches('.delete-company-btn')) {
                 const companyId = target.dataset.companyId;
                 const company = state.companies.find(c => c.id == companyId);
                 openDeleteCompanyModal(company);
             }
 
-            // Flujo para salir de una empresa
             if (target.matches('.leave-company-btn')) {
                 const companyId = target.dataset.companyId;
                 const company = state.companies.find(c => c.id == companyId);
@@ -1293,6 +1380,10 @@
             if (data.fecha_vencimiento === '') data.fecha_vencimiento = null;
 
             data.costo = parseFloat(data.costo) || 0;
+            // --- NUEVO: Parsear campos de depreciación ---
+            data.vida_util = parseInt(data.vida_util) || null;
+            data.valor_residual = parseFloat(data.valor_residual) || 0;
+
             if (data.stock) data.stock = parseInt(data.stock);
             data.proveedor_id = data.proveedor_id ? parseInt(data.proveedor_id) : null;
 
@@ -1376,7 +1467,7 @@
         
         userForm.addEventListener('submit', async e => {
             e.preventDefault();
-            if (!verificarEmpresaActiva()) return; // Salvaguarda extra
+            if (!verificarEmpresaActiva()) return;
             
             const formData = new FormData(userForm);
             const data = {
@@ -1692,7 +1783,7 @@
         const openImportModal = (type) => {
             state.importingType = type;
             const headersMap = {
-                equipos: 'marca,modelo,numero_serie,estado,ubicacion,numero_factura,fecha_compra,fecha_vencimiento_garantia,costo',
+                equipos: 'marca,modelo,numero_serie,estado,ubicacion,numero_factura,fecha_compra,fecha_vencimiento_garantia,costo,vida_util,valor_residual',
                 software: 'nombre,tipo,version,stock,numero_factura,fecha_compra,fecha_vencimiento,costo',
                 perifericos: 'tipo,marca,modelo,numero_serie,estado,numero_factura,fecha_compra,fecha_vencimiento_garantia,costo',
                 registros: 'nombre,cargo,departamento,cedula,fecha_ingreso,induccion_tic,cuentas_creadas'
@@ -1748,8 +1839,11 @@
                 const cleanedData = dataToImport.map(row => {
                     Object.keys(row).forEach(key => {
                         if (row[key] === '') row[key] = null;
-                        if (key === 'costo' && row[key]) {
+                        if (['costo', 'valor_residual'].includes(key) && row[key]) {
                             row[key] = parseFloat(row[key]);
+                        }
+                        if (key === 'vida_util' && row[key]) {
+                            row[key] = parseInt(row[key]);
                         }
                         if (key === 'induccion_tic' && row[key]) {
                             row[key] = ['true', 'si', '1'].includes(row[key].toLowerCase());
@@ -1777,10 +1871,90 @@
                 statusEl.className = 'text-sm text-center text-red-600';
             }
         });
-
-        // --- FUNCIONES DE REPORTES ---
+        
+        // --- LÓGICA DE DEPRECIACIÓN Y REPORTES ---
         const formatCurrency = (value) => {
+            if (typeof value !== 'number') value = 0;
             return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
+        };
+
+        /**
+         * Calcula la depreciación de un activo usando el método de línea recta.
+         * @param {object} asset - El objeto del activo (equipo).
+         * @returns {object|null} - Objeto con los valores de depreciación o null si no se puede calcular.
+         */
+        const calculateDepreciation = (asset) => {
+            const costo = parseFloat(asset.costo);
+            const valor_residual = parseFloat(asset.valor_residual) || 0;
+            const vida_util = parseInt(asset.vida_util);
+            const fecha_compra = asset.fecha_compra ? new Date(asset.fecha_compra) : null;
+
+            if (isNaN(costo) || isNaN(vida_util) || vida_util <= 0 || !fecha_compra) {
+                return null; // No se puede calcular sin los datos básicos
+            }
+
+            const baseDepreciable = costo - valor_residual;
+            const depreciacionAnual = baseDepreciable / vida_util;
+
+            const hoy = new Date();
+            if (fecha_compra > hoy) {
+                return { depreciacionAnual, depreciacionAcumulada: 0, valorEnLibros: costo, tiempoTranscurrido: 0 };
+            }
+
+            const diffMilisegundos = hoy - fecha_compra;
+            const tiempoTranscurridoTotal = diffMilisegundos / (1000 * 60 * 60 * 24 * 365.25); // Años con decimales
+
+            let depreciacionAcumulada = depreciacionAnual * tiempoTranscurridoTotal;
+            depreciacionAcumulada = Math.min(depreciacionAcumulada, baseDepreciable);
+
+            const valorEnLibros = costo - depreciacionAcumulada;
+
+            return {
+                depreciacionAnual,
+                depreciacionAcumulada,
+                valorEnLibros,
+                tiempoTranscurrido: tiempoTranscurridoTotal
+            };
+        };
+
+        const renderDepreciationPage = () => {
+            const container = document.getElementById('depreciation-table-container');
+            container.innerHTML = '';
+            const equipos = state.inventario.equipos;
+
+            if (equipos.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 py-8">No hay equipos en el inventario.</p>`;
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'min-w-full';
+            table.innerHTML = `<thead class="bg-gray-50"><tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Costo Original</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dep. Acumulada</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor en Libros</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vida Útil (Años)</th>
+            </tr></thead>`;
+
+            const tbody = document.createElement('tbody');
+            tbody.className = "bg-white divide-y divide-gray-200";
+
+            equipos.forEach(equipo => {
+                const depData = calculateDepreciation(equipo);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${equipo.marca} ${equipo.modelo}<p class="text-xs text-gray-500">S/N: ${equipo.numero_serie}</p></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${formatCurrency(equipo.costo || 0)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${depData ? formatCurrency(depData.depreciacionAcumulada) : 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">${depData ? formatCurrency(depData.valorEnLibros) : 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center">${equipo.vida_util || 'N/A'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            table.appendChild(tbody);
+            container.appendChild(table);
         };
 
         const renderReportsPage = () => {
@@ -1891,19 +2065,19 @@
           const acceptedCompanies = state.companies.filter(c => c.status === 'accepted');
 
           if (pendingInvitations.length > 0) {
-               invitationsContainer.innerHTML = `<h3 class="text-lg font-semibold border-b pb-2 mb-2">Invitaciones Pendientes</h3>`;
-               pendingInvitations.forEach(invite => {
-                   const inviteCard = document.createElement('div');
-                   inviteCard.className = 'p-4 border rounded-lg flex justify-between items-center bg-yellow-50';
-                   inviteCard.innerHTML = `
-                        <p>Has sido invitado a unirte a <strong>${invite.name}</strong>.</p>
-                        <div class="flex gap-2">
-                            <button data-company-id="${invite.id}" class="accept-invite-btn py-1 px-3 text-sm rounded-md text-white bg-green-600 hover:bg-green-700">Aceptar</button>
-                            <button data-company-id="${invite.id}" class="decline-invite-btn py-1 px-3 text-sm rounded-md text-white bg-red-600 hover:bg-red-700">Rechazar</button>
-                        </div>
-                   `;
-                   invitationsContainer.appendChild(inviteCard);
-               });
+             invitationsContainer.innerHTML = `<h3 class="text-lg font-semibold border-b pb-2 mb-2">Invitaciones Pendientes</h3>`;
+             pendingInvitations.forEach(invite => {
+                 const inviteCard = document.createElement('div');
+                 inviteCard.className = 'p-4 border rounded-lg flex justify-between items-center bg-yellow-50';
+                 inviteCard.innerHTML = `
+                     <p>Has sido invitado a unirte a <strong>${invite.name}</strong>.</p>
+                     <div class="flex gap-2">
+                         <button data-company-id="${invite.id}" class="accept-invite-btn py-1 px-3 text-sm rounded-md text-white bg-green-600 hover:bg-green-700">Aceptar</button>
+                         <button data-company-id="${invite.id}" class="decline-invite-btn py-1 px-3 text-sm rounded-md text-white bg-red-600 hover:bg-red-700">Rechazar</button>
+                     </div>
+                 `;
+                 invitationsContainer.appendChild(inviteCard);
+             });
           }
 
 
@@ -1921,8 +2095,8 @@
                       const statusText = member.status === 'pending' ? 'Pendiente' : member.role;
                       return `
                           <li class="flex justify-between items-center text-sm py-1">
-                              <span>${member.email}</span>
-                              <span class="text-xs font-semibold ${statusColor} px-2 py-1 rounded-full">${statusText}</span>
+                                  <span>${member.email}</span>
+                                  <span class="text-xs font-semibold ${statusColor} px-2 py-1 rounded-full">${statusText}</span>
                           </li>
                       `;
                   }).join('') : '<li class="text-sm text-gray-500">Aún no hay miembros.</li>';
@@ -1934,19 +2108,19 @@
                   const card = document.createElement('div');
                   card.className = 'p-4 border rounded-lg space-y-3';
                   card.innerHTML = `
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-lg">${company.name} ${isOwner ? '<span class="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Propietario</span>' : ''}</h3>
-                             <div class="flex gap-2">
-                                 ${isOwner ? `<button data-company-id="${company.id}" class="invite-user-btn py-1 px-3 text-sm rounded-md text-white bg-green-600 hover:bg-green-700">Invitar</button>` : ''}
-                                 ${actionButtonHtml}
-                             </div>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-sm mb-2">Miembros:</h4>
-                            <ul class="space-y-1">
-                                ${membersHtml}
-                            </ul>
-                        </div>
+                      <div class="flex justify-between items-center">
+                          <h3 class="font-bold text-lg">${company.name} ${isOwner ? '<span class="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Propietario</span>' : ''}</h3>
+                           <div class="flex gap-2">
+                               ${isOwner ? `<button data-company-id="${company.id}" class="invite-user-btn py-1 px-3 text-sm rounded-md text-white bg-green-600 hover:bg-green-700">Invitar</button>` : ''}
+                               ${actionButtonHtml}
+                           </div>
+                      </div>
+                      <div>
+                          <h4 class="font-semibold text-sm mb-2">Miembros:</h4>
+                          <ul class="space-y-1">
+                              ${membersHtml}
+                          </ul>
+                      </div>
                   `;
                   companyContainer.appendChild(card);
               }
@@ -2054,7 +2228,7 @@
                 .on(
                     'postgres_changes',
                     {
-                        event: '*', // Escuchar INSERT, UPDATE, DELETE
+                        event: '*',
                         schema: 'public',
                         table: 'company_users',
                         filter: `user_id=eq.${state.user.id}`
@@ -2115,7 +2289,6 @@
 
         // --- INICIALIZACIÓN Y LOGIN ---
         const checkLogin = async () => {
-            // Si estamos en modo recuperación, no hacer nada
             if (isRecoveringPassword) {
                 console.log("Password recovery in progress, skipping login check.");
                 return;
@@ -2196,7 +2369,6 @@
             }
         });
 
-        // --- LÓGICA PARA RESTABLECER CONTRASEÑA ---
         forgotPasswordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = forgotPasswordForm.email.value;
@@ -2244,9 +2416,8 @@
                 errorEl.classList.remove('hidden');
             } else {
                 showToast('Contraseña actualizada con éxito.', 'success');
-                isRecoveringPassword = false; // Reseteamos el flag
+                isRecoveringPassword = false;
                 resetPasswordModal.close();
-                // Ahora que la contraseña está establecida, procedemos a la aplicación.
                 await checkLogin();
             }
         });
@@ -2304,11 +2475,9 @@
         supabaseClient.auth.onAuthStateChange((event, session) => {
             console.log(`Auth event: ${event}`);
             if (event === 'PASSWORD_RECOVERY') {
-                // Activamos el flag y mostramos el modal.
                 isRecoveringPassword = true;
                 resetPasswordModal.showModal();
             } else {
-                // Para otros eventos como SIGNED_IN, SIGNED_OUT, etc.
                 checkLogin();
             }
         });
@@ -2404,6 +2573,79 @@
                 }
             }
         });
+
+        // --- LÓGICA DE DONACIÓN CON PAYPAL ---
+        const openDonateModal = () => {
+            customDonateAmountInput.value = '';
+            document.querySelectorAll('.donate-amount-btn').forEach(btn => btn.classList.remove('bg-green-200'));
+            document.getElementById('paypal-button-container').innerHTML = '';
+            document.getElementById('donation-success-message').classList.add('hidden');
+            donateModal.showModal();
+        };
+
+        headerDonateBtn.addEventListener('click', openDonateModal);
+        mainDonateBtn.addEventListener('click', openDonateModal);
+        
+        document.querySelectorAll('.donate-amount-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.donate-amount-btn').forEach(b => b.classList.remove('bg-green-200'));
+                btn.classList.add('bg-green-200');
+                customDonateAmountInput.value = '';
+            });
+        });
+        
+        customDonateAmountInput.addEventListener('input', () => {
+             document.querySelectorAll('.donate-amount-btn').forEach(btn => btn.classList.remove('bg-green-200'));
+        });
+
+        confirmDonationBtn.addEventListener('click', () => {
+            let amount = customDonateAmountInput.value;
+            const selectedBtn = document.querySelector('.donate-amount-btn.bg-green-200');
+            
+            if (!amount && selectedBtn) {
+                amount = selectedBtn.dataset.amount;
+            }
+
+            if (amount && parseFloat(amount) > 0) {
+                donateModal.close();
+                showPage('donacion');
+                renderPayPalButton(amount);
+            } else {
+                showToast('Por favor, selecciona o ingresa un monto válido.', 'error');
+            }
+        });
+
+        function renderPayPalButton(amount) {
+            const paypalContainer = document.getElementById('paypal-button-container');
+            paypalContainer.innerHTML = '';
+            document.getElementById('donation-success-message').classList.add('hidden');
+
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: amount,
+                                currency_code: 'USD'
+                            },
+                            description: 'Donación para el proyecto de Gestión de Activos TIC'
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        console.log('Donación completada:', details);
+                        paypalContainer.innerHTML = '';
+                        document.getElementById('donation-success-message').classList.remove('hidden');
+                        showToast('¡Gracias por tu generosa donación!', 'success');
+                    });
+                },
+                onError: function(err) {
+                    console.error('Error en el pago de PayPal:', err);
+                    showToast('Ocurrió un error durante el pago. Por favor, intenta de nuevo.', 'error');
+                }
+            }).render('#paypal-button-container');
+        }
 
     });
     </script>
